@@ -7,6 +7,11 @@
 *.obj
 *.elf
 
+#Idea
+*.idea
+
+cmake-build-debug/
+
 # Linker output
 *.ilk
 *.map
