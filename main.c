@@ -5,6 +5,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/wait.h>
+#include <signal.h>
+#include <getopt.h> // Para analizar los argumentos de línea de comandos
 
 #define PORT 9393
 #define BUFFER_SIZE 1024
@@ -78,7 +80,7 @@ void handle_python_request(int client_socket, const char *filename) {
             }
             pclose(python_output);
         } else {
-            send_response(client_socket, "500 Internal Server Error", "text/py", "Error executing Python script.");
+            send_response(client_socket, "500 Internal Server Error", "text/plain", "Error executing Python script.");
         }
         fclose(file);
     } else {
@@ -115,10 +117,23 @@ void handle_connection(int client_socket) {
     close(client_socket);
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    int opt;
+    int port = PORT; // Puerto predeterminado
+
+    // Analizamos los argumentos de línea de comandos para obtener el puerto especificado
+    while ((opt = getopt(argc, argv, "p:")) != -1) {
+        switch (opt) {
+            case 'p':
+                port = atoi(optarg); // Convertimos el argumento de cadena a entero
+                break;
+            default:
+                fprintf(stderr, "Uso: %s -p <port>\n", argv[0]);
+                exit(EXIT_FAILURE);
+        }
+    }
     int server_fd, client_socket;
     struct sockaddr_in address;
-    int opt = 1;
     int addrlen = sizeof(address);
 
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
@@ -133,7 +148,7 @@ int main() {
     }
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(PORT);
+    address.sin_port = htons(port);
 
     if (bind(server_fd, (struct sockaddr *)&address,
              sizeof(address)) < 0) {
