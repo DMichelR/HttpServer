@@ -6,11 +6,11 @@
 #include <netinet/in.h>
 #include <sys/wait.h>
 
-#define PORT 8080
+#define PORT 9393
 #define BUFFER_SIZE 1024
 #define MAX_CONNECTIONS 30
 
-const char *server_info = "Server: MyHTTPServer/1.0\r\n\r\n";
+const char *server_info = "Server: DiegoHTTPServer/1.0\r\n\r\n";
 int server_fd;
 
 char *get_path() {
